@@ -25,17 +25,17 @@ services:
       - redis-queue
       - redis-socketio
 
-    frontend:
-      build:
-        context:
-        dockerfile: Dockerfile-frontend
-      containerport: erpnext-frontenf
-      ports:
-        - "8081:80"
-      volumes: 
-        _ assets-vol:/usr/share/nginx/html/assets:ro
-      depends_on:
-        - backend 
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: erpnext-frontend
+    ports:
+      - "8081:80"
+    volumes:
+      - assets-vol:/usr/share/nginx/html/assets:ro
+    depends_on:
+      - backend
 
 
 

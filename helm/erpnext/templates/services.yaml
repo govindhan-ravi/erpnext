@@ -1,25 +1,25 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Release.Name }}-backend
+  name: "{{ .Release.Name }}-backend"
 spec:
   selector:
     app: erpnext-backend
   ports:
     - protocol: TCP
-      port: {{ .Values.service.backendPort }}
+      port: {{ .Values.service.backendPort | quote }}
       targetPort: 8000
   type: ClusterIP
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Release.Name }}-frontend
+  name: "{{ .Release.Name }}-frontend"
 spec:
   selector:
     app: erpnext-frontend
   ports:
     - protocol: TCP
-      port: {{ .Values.service.frontendPort }}
+      port: {{ .Values.service.frontendPort | quote }}
       targetPort: 80
-  type: {{ .Values.service.type }}
+  type: "{{ .Values.service.type }}"

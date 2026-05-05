@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "waiting for Database ..."
-while !  mariadb -admin ping -h"$DB_HOST" --silent; do
+while !  mariadb-admin ping -h"$DB_HOST" --silent; do
     sleep 1
 done
 echo "Database is ready"
@@ -23,4 +23,4 @@ bench use site1.local
 
 #start the bench server
 echo "starting bench..."
-bench server --port 8000
+bench serve --port 8000
