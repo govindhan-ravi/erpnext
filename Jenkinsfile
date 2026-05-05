@@ -16,6 +16,7 @@ pipeline {
                 checkout scm
             }
         }
+ 
         stage('Install Dependencies') {
             parallel {
                 stage('Install Frontend Deps') {
@@ -32,6 +33,7 @@ pipeline {
                 }
             }
         }
+ 
         stage('ESLint') {
             steps {
                 script {
@@ -45,6 +47,7 @@ pipeline {
                 }
             }
         }
+ 
         stage('Tests') {
             parallel {
                 stage('Frontend Tests') {
@@ -68,6 +71,7 @@ pipeline {
                 }
             }
         }
+ 
         stage('SonarQube Scan') {
             steps {
                 script {
@@ -77,6 +81,7 @@ pipeline {
                 }
             }
         }
+ 
         stage('Quality Gate') {
             steps {
                 timeout(time: 1, unit: 'HOURS') {
@@ -84,11 +89,13 @@ pipeline {
                 }
             }
         }
+ 
         stage('Trivy FS Scan') {
             steps {
                 sh 'trivy fs .'
             }
         }
+ 
         stage('Docker Build') {
             steps {
                 script {
@@ -97,12 +104,14 @@ pipeline {
                 }
             }
         }
+ 
         stage('Trivy Image Scan') {
             steps {
                 sh "trivy image ${DOCKER_HUB_USER}/${DOCKER_HUB_REPO_BACKEND}:${IMAGE_TAG}"
                 sh "trivy image ${DOCKER_HUB_USER}/${DOCKER_HUB_REPO_FRONTEND}:${IMAGE_TAG}"
             }
         }
+ 
         stage('Docker Login') {
             steps {
                 script {
@@ -112,6 +121,7 @@ pipeline {
                 }
             }
         }
+ 
         stage('Docker Push') {
             steps {
                 script {
@@ -120,11 +130,13 @@ pipeline {
                 }
             }
         }
+ 
         stage('Helm Lint') {
             steps {
                 sh 'helm lint helm/erpnext'
             }
         }
+ 
         stage('EKS Authentication') {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
@@ -132,6 +144,7 @@ pipeline {
                 }
             }
         }
+ 
         stage('Deploy to EKS') {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
@@ -146,6 +159,7 @@ pipeline {
                 }
             }
         }
+ 
         stage('Deploy Observability Stack') {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
@@ -163,16 +177,19 @@ pipeline {
                 }
             }
         }
+ 
         stage('Output Access URLs') {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
                     script {
                         echo "Waiting for AWS LoadBalancers to provision (this can take 2-3 minutes)..."
                         sleep 60
+                       
                         def prometheusUrl = sh(script: "kubectl get svc -n monitoring prometheus-kube-prometheus-prometheus -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' || echo 'Pending'", returnStdout: true).trim()
                         def grafanaUrl = sh(script: "kubectl get svc -n monitoring prometheus-grafana -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' || echo 'Pending'", returnStdout: true).trim()
                         def grafanaPass = sh(script: "kubectl get secret --namespace monitoring prometheus-grafana -o jsonpath='{.data.admin-password}' | base64 --decode || echo 'prom-operator'", returnStdout: true).trim()
                         def appUrl = sh(script: "kubectl get svc -n default erpnext-release-frontend -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' || echo 'Pending'", returnStdout: true).trim()
+                       
                         echo "======================================================="
                         echo "🚀 DEPLOYMENT SUCCESSFUL!"
                         echo "🔥 Prometheus UI: http://${prometheusUrl}:9090"
@@ -186,6 +203,7 @@ pipeline {
             }
         }
     }
+ 
     post {
         always {
             cleanWs()

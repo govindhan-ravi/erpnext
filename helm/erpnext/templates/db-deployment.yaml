@@ -14,10 +14,10 @@ spec:
     spec:
       containers:
         - name: mariadb
-          image: "{{ .Values.mariadb.image }}"
+          image: {{ .Values.mariadb.image }}
           env:
             - name: MYSQL_ROOT_PASSWORD
-              value: "{{ .Values.mariadb.rootPassword }}"
+              value: {{ .Values.mariadb.rootPassword }}
           ports:
             - containerPort: 3306
 ---
