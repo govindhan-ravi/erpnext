@@ -1,0 +1,33 @@
+{{- if .Values.mariadb.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: erpnext-db
+spec:
+  selector:
+    matchLabels:
+      app: erpnext-db
+  template:
+    metadata:
+      labels:
+        app: erpnext-db
+    spec:
+      containers:
+        - name: mariadb
+          image: {{ .Values.mariadb.image }}
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: {{ .Values.mariadb.rootPassword }}
+          ports:
+            - containerPort: 3306
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: erpnext-db
+spec:
+  selector:
+    app: erpnext-db
+  ports:
+    - port: 3306
+{{- end }}

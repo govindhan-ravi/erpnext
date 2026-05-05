@@ -1,0 +1,66 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: expnext-backend
+
+    volumes:
+    - site-vol:/home/frappe/frappe-bench/sites
+    - assets-vol:/home/frappe/frappe-bench/sites/assets
+
+    environment:
+    DB_HOST: db
+    DB_PORT: 3306
+    MYSQL_ROOT_PASSWORD: admin
+    REDIS_CACHE: redis://redis-cache:6379
+    REDIS_QUEUE: redis://redis-queue:6379
+    REDIS_SOCKETIO: redis://redis-socketio:6379
+
+    depends_on:
+      - db
+      - redis-cache
+      - redis-queue
+      - redis-socketio
+
+    frontend:
+      build:
+        context:
+        dockerfile: Dockerfile-frontend
+      containerport: erpnext-frontenf
+      ports:
+        - "8081:80"
+      volumes: 
+        _ assets-vol:/usr/share/nginx/html/assets:ro
+      depends_on:
+        - backend 
+
+
+
+  db:
+    image: mariadb:10.6
+    container_name: erpnext-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+    volumes:
+      - db-data:/var/lib/mysql
+
+  redis-cache:
+    image: redis:7-alpine
+    container_name: redis-cache
+
+  redis-queue:
+    image: redis:7-alpine
+    container_name: redis-queue
+
+  redis-socketio:
+    image: redis:7-alpine 
+    container_name: redis-socketio
+
+volumes:
+  db-data:
+  site-vol:
+  assets-vol: 

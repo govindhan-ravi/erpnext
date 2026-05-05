@@ -1,0 +1,48 @@
+FROM python:3.11-slim-bookworm
+#1.install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    meriadb-client \
+    libmariadb-dev \
+    gcc \
+    build-essential \
+    libssl-dev \
+    libffi-dev \
+    python3-dev \
+    redis-server \
+    pkg-config \
+    cron \
+    gettext \
+    && rm -rf /var/lib/apt/lists/*
+
+#2.install node.js 18
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs \
+    && npm install -g yarn
+
+#3. create frappe user
+RUN useradd -ms /bin/bash frappe
+USER frappe
+WORKDIR /home/frappe
+#4. install bench
+RUN pip install --user frappe-bench
+ENV PATH="/home/frappe/.local/bin:${PATH}"
+
+#5.initialize bench
+RUN bench init frappe-bench \
+    --frappe-branch version-14 \
+    --skip-redis-config-generation \
+    --skip-assets 
+
+WORKDIR /home/frappe/frappe-bench
+#6.get erpnext app
+RUN bench get-app erpnext --branch version-14
+#7.setup entrypoint script
+COPY --chown=frappe:frappe entrypoint.sh /home/frappe/entrypoint.sh
+RUN chmod +x /home/frappe/entrypoint.sh
+#8.final build & expose
+RUN bench build
+EXPOSE 8000
+#9.start via entrypoint
+ENTRYPOINT ["/home/frappe/entrypoint.sh"]

@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-backend
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: erpnext-backend
+  template:
+    metadata:
+      labels:
+        app: erpnext-backend
+    spec:
+      containers:
+        - name: backend
+          image: "{{ .Values.image.backend.repository }}:{{ .Values.image.backend.tag }}"
+          imagePullPolicy: {{ .Values.image.backend.pullPolicy }}
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DB_HOST
+              value: {{ .Values.mariadb.host }}
+            - name: MYSQL_ROOT_PASSWORD
+              value: {{ .Values.mariadb.rootPassword }}
+            - name: REDIS_CACHE
+              value: redis://{{ .Values.redis.cache.host }}:6379
+            - name: REDIS_QUEUE
+              value: redis://{{ .Values.redis.queue.host }}:6379
+            - name: REDIS_SOCKETIO
+              value: redis://{{ .Values.redis.socketio.host }}:6379
