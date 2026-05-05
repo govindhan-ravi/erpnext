@@ -17,7 +17,7 @@ if [ ! -d "sites/site1.local" ]; then
         --admin-password admin \
         --mariadb-root-password "$MYSQL_ROOT_PASSWORD" \
         --db-host "$DB_HOST" \
-        --db-root-user root \
+        --db-root-username root \
         --force
 
     echo "installing erpnext..."
