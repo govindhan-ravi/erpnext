@@ -21,6 +21,7 @@ fi
 
 #set defult site
 bench use site1.local
+python3 -c "import json; f=open('sites/common_site_config.json', 'r'); data=json.load(f); data['default_site']='site1.local'; f=open('sites/common_site_config.json', 'w'); json.dump(data, f, indent=4)"
 
 #start the bench server
 echo "starting bench..."
