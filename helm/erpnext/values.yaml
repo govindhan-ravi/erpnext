@@ -20,9 +20,9 @@ service:
   frontendPort: 80
 
 mariadb:
-  enabled: false
+  enabled: true
   rootPassword: YourStrongPassword123
-  host: database-1.cufiakkakod0.us-east-1.rds.amazonaws.com
+  host: erpnext-db
   image: mariadb:10.6
 
 redis:
