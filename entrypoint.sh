@@ -6,6 +6,11 @@ while ! mariadb-admin ping -h"$DB_HOST" -u root -p"$MYSQL_ROOT_PASSWORD" --silen
 done
 echo "Database is ready"
 
+# Setup Redis Config
+bench set-config -g redis_cache redis://redis-cache:6379
+bench set-config -g redis_queue redis://redis-queue:6379
+bench set-config -g redis_socketio redis://redis-socketio:6379
+
 if [ ! -d "sites/site1.local" ]; then
     echo "creating new site site1.local..."
     bench new-site site1.local \
