@@ -7,7 +7,7 @@ spec:
     app: erpnext-backend
   ports:
     - protocol: TCP
-      port: {{ .Values.service.backendPort | quote }}
+      port: {{ .Values.service.backendPort }}
       targetPort: 8000
   type: ClusterIP
 ---
@@ -20,6 +20,6 @@ spec:
     app: erpnext-frontend
   ports:
     - protocol: TCP
-      port: {{ .Values.service.frontendPort | quote }}
+      port: {{ .Values.service.frontendPort }}
       targetPort: 80
   type: "{{ .Values.service.type }}"

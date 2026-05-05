@@ -26,6 +26,7 @@ pipeline {
                 stage('Install Backend Deps') {
                     steps {
                         sh 'python3 -m pip install --upgrade pip --break-system-packages'
+                        sh 'python3 -m pip install frappe-framework --break-system-packages'
                         sh 'python3 -m pip install -e . --break-system-packages'
                     }
                 }
